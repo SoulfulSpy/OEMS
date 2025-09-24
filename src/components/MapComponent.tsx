@@ -1,36 +1,40 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { LatLngTuple } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { useRideStore } from '../contexts/rideStore';
-import { useUserLocation } from '../hooks/useUserLocation';
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { LatLngTuple } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useRideStore } from "../contexts/rideStore";
+import { useUserLocation } from "../hooks/useUserLocation";
 
 // Fix for default markers in react-leaflet
-import L from 'leaflet';
+import L from "leaflet";
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
 const defaultCenter: LatLngTuple = [22.4734, 88.4263]; // Rajpur Sonarpur, West Bengal
 
 const MapUpdater: React.FC<{ center: LatLngTuple }> = ({ center }) => {
   const map = useMap();
-  
+
   useEffect(() => {
     map.setView(center, map.getZoom());
   }, [center, map]);
-  
+
   return null;
 };
 
 const MapComponent: React.FC = () => {
-  const { userLocation, pickupLocation, destination, currentTrip } = useRideStore();
+  const { userLocation, pickupLocation, destination, currentTrip } =
+    useRideStore();
   const { getCurrentLocation } = useUserLocation();
-  
-  const mapCenter: LatLngTuple = userLocation 
+
+  const mapCenter: LatLngTuple = userLocation
     ? [userLocation.latitude, userLocation.longitude]
     : defaultCenter;
 
@@ -46,15 +50,15 @@ const MapComponent: React.FC = () => {
         className="w-full h-full"
         zoomControl={true}
         attributionControl={false}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        
+
         <MapUpdater center={mapCenter} />
-        
+
         {/* User Location Marker */}
         {userLocation && (
           <Marker position={[userLocation.latitude, userLocation.longitude]}>
@@ -67,20 +71,24 @@ const MapComponent: React.FC = () => {
             </Popup>
           </Marker>
         )}
-        
+
         {/* Pickup Location Marker */}
         {pickupLocation && (
-          <Marker position={[pickupLocation.latitude, pickupLocation.longitude]}>
+          <Marker
+            position={[pickupLocation.latitude, pickupLocation.longitude]}
+          >
             <Popup>
               <div className="text-center">
                 <strong className="text-blue-700">Pickup Location</strong>
                 <br />
-                <span className="text-sm text-gray-600">Trip starting point</span>
+                <span className="text-sm text-gray-600">
+                  Trip starting point
+                </span>
               </div>
             </Popup>
           </Marker>
         )}
-        
+
         {/* Destination Marker */}
         {destination && (
           <Marker position={[destination.latitude, destination.longitude]}>
@@ -88,28 +96,38 @@ const MapComponent: React.FC = () => {
               <div className="text-center">
                 <strong className="text-green-700">Destination</strong>
                 <br />
-                <span className="text-sm text-gray-600">{destination.address}</span>
+                <span className="text-sm text-gray-600">
+                  {destination.address}
+                </span>
               </div>
             </Popup>
           </Marker>
         )}
-        
+
         {/* Driver Location Marker */}
         {currentTrip?.driver && (
-          <Marker position={[currentTrip.driver.location.latitude, currentTrip.driver.location.longitude]}>
+          <Marker
+            position={[
+              currentTrip.driver.location.latitude,
+              currentTrip.driver.location.longitude,
+            ]}
+          >
             <Popup>
               <div className="text-center">
-                <strong className="text-purple-700">{currentTrip.driver.name}</strong>
+                <strong className="text-purple-700">
+                  {currentTrip.driver.name}
+                </strong>
                 <br />
                 <span className="text-sm text-gray-600">
-                  {currentTrip.driver.vehicle.make} {currentTrip.driver.vehicle.model}
+                  {currentTrip.driver.vehicle.make}{" "}
+                  {currentTrip.driver.vehicle.model}
                 </span>
               </div>
             </Popup>
           </Marker>
         )}
       </MapContainer>
-      
+
       {/* Map Controls */}
       <div className="absolute bottom-4 right-4 z-10 space-y-2">
         <button
@@ -120,7 +138,7 @@ const MapComponent: React.FC = () => {
           <span className="text-xl">📍</span>
         </button>
       </div>
-      
+
       {/* Map Legend/Info */}
       <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-md p-3 max-w-xs">
         <h4 className="text-sm font-semibold text-gray-700 mb-2">Map View</h4>

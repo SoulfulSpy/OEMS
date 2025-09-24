@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Search, Home, Briefcase, ArrowRight } from 'lucide-react';
-import { useRideStore } from '../contexts/rideStore';
-import DestinationSearch from './DestinationSearch';
+import React, { useState } from "react";
+import { Search, Home, Briefcase, ArrowRight } from "lucide-react";
+import { useRideStore } from "../contexts/rideStore";
+import DestinationSearch from "./DestinationSearch";
 
 interface SearchBarProps {
   onMenuClick: () => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ }) => {
+const SearchBar: React.FC<SearchBarProps> = ({}) => {
   const [showDestinationSearch, setShowDestinationSearch] = useState(false);
   const { destination, userLocation } = useRideStore();
 
@@ -34,7 +34,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ }) => {
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-gray-600 truncate">
-                    {userLocation?.address || 'Current location'}
+                    {userLocation?.address || "Current location"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -42,7 +42,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ }) => {
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span className="font-medium text-gray-800 truncate">{destination.address}</span>
+                  <span className="font-medium text-gray-800 truncate">
+                    {destination.address}
+                  </span>
                 </div>
               </div>
               <ArrowRight className="w-5 h-5 text-gray-400" />
