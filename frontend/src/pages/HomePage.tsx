@@ -3,11 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   Car,
-  Navigation,
   Star,
   Shield,
-  Clock,
-  MapPin,
   Globe,
   Menu,
   Zap,

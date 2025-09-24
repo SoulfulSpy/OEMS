@@ -5,7 +5,7 @@ import { useAuthStore } from '../contexts/authStore';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import SocialLoginButtons from '../components/SocialLoginButtons';
-import { sendOTP, verifyOTP } from '../services/authService';
+import { sendOTP, verifyOTP, completeProfile } from '../services/authService';
 
 const LoginPage: React.FC = () => {
   const [step, setStep] = useState<'phone' | 'otp' | 'profile'>('phone');
@@ -18,7 +18,6 @@ const LoginPage: React.FC = () => {
 
   const handleSendOTP = async () => {
     if (!phoneNumber || phoneNumber.length < 10) return;
-    
     setIsLoading(true);
     try {
       await sendOTP(phoneNumber);
@@ -32,14 +31,14 @@ const LoginPage: React.FC = () => {
 
   const handleVerifyOTP = async () => {
     if (!otp || otp.length !== 6) return;
-    
     setIsLoading(true);
     try {
       const result = await verifyOTP(phoneNumber, otp);
       if (result.isNewUser) {
         setStep('profile');
-      } else {
+      } else if (result.user) {
         login(result.user);
+        (window as any).currentUser = result.user;
       }
     } catch (error) {
       console.error('Failed to verify OTP:', error);
@@ -50,16 +49,11 @@ const LoginPage: React.FC = () => {
 
   const handleCompleteProfile = async () => {
     if (!name || !email) return;
-    
     setIsLoading(true);
     try {
-      const user = {
-        id: `user_${Date.now()}`,
-        name,
-        email,
-        phone: phoneNumber,
-      };
+      const user = await completeProfile(name, email, phoneNumber);
       login(user);
+      (window as any).currentUser = user;
     } catch (error) {
       console.error('Failed to complete profile:', error);
     } finally {
@@ -69,7 +63,6 @@ const LoginPage: React.FC = () => {
 
   const handleSocialLogin = async (provider: 'google' | 'apple') => {
     setLoading(true);
-    // Simulate social login
     setTimeout(() => {
       const user = {
         id: `user_${provider}_${Date.now()}`,
@@ -78,6 +71,7 @@ const LoginPage: React.FC = () => {
         phone: '+1234567890',
       };
       login(user);
+      (window as any).currentUser = user;
       setLoading(false);
     }, 2000);
   };

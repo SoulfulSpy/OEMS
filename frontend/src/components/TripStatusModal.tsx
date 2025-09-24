@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Star, ThumbsUp, Clock, MapPin } from 'lucide-react';
-import { Trip } from '../contexts/rideStore';
-import Button from './Button';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Star, Clock, MapPin } from "lucide-react";
+import { Trip } from "../contexts/rideStore";
+import Button from "./Button";
 
 interface TripStatusModalProps {
   trip: Trip;
@@ -11,13 +11,11 @@ interface TripStatusModalProps {
 const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
   const [rating, setRating] = useState(5);
   const [tip, setTip] = useState(0);
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState("");
   const [showReceipt, setShowReceipt] = useState(false);
 
-  const tipOptions = [20, 30, 50];
-
   const handleSubmitRating = () => {
-    console.log('Rating submitted:', { rating, tip, feedback });
+    console.log("Rating submitted:", { rating, tip, feedback });
     setShowReceipt(true);
   };
 
@@ -29,7 +27,7 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
         className="fixed inset-0 z-50 bg-black/50 flex items-end"
       >
         <motion.div
-          initial={{ y: '100%' }}
+          initial={{ y: "100%" }}
           animate={{ y: 0 }}
           className="w-full bg-white rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
         >
@@ -44,24 +42,28 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
           {/* Receipt */}
           <div className="glass-panel p-6 mb-6">
             <h3 className="font-semibold mb-4">Trip details</h3>
-            
+
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-green-500 mt-1" />
                 <div>
                   <p className="font-medium">From</p>
-                  <p className="text-sm text-gray-600">{trip.pickupLocation.address}</p>
+                  <p className="text-sm text-gray-600">
+                    {trip.pickupLocation.address}
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-red-500 mt-1" />
                 <div>
                   <p className="font-medium">To</p>
-                  <p className="text-sm text-gray-600">{trip.destination.address}</p>
+                  <p className="text-sm text-gray-600">
+                    {trip.destination.address}
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5 text-gray-400" />
                 <div>
@@ -89,10 +91,7 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
             </div>
           </div>
 
-          <Button
-            onClick={() => window.location.reload()}
-            className="w-full"
-          >
+          <Button onClick={() => window.location.reload()} className="w-full">
             Done
           </Button>
         </motion.div>
@@ -107,13 +106,15 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
       className="fixed inset-0 z-50 bg-black/50 flex items-end"
     >
       <motion.div
-        initial={{ y: '100%' }}
+        initial={{ y: "100%" }}
         animate={{ y: 0 }}
         className="w-full bg-white rounded-t-3xl p-6"
       >
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold mb-2">Rate your trip</h2>
-          <p className="text-gray-600">How was your ride with {trip.driver.name}?</p>
+          <p className="text-gray-600">
+            How was your ride with {trip.driver.name}?
+          </p>
         </div>
 
         {/* Driver Info */}
@@ -124,7 +125,8 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
               alt={trip.driver.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48x48?text=👤';
+                (e.target as HTMLImageElement).src =
+                  "https://via.placeholder.com/48x48?text=👤";
               }}
             />
           </div>
@@ -148,8 +150,8 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
                 <Star
                   className={`w-8 h-8 ${
                     star <= rating
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-gray-300"
                   }`}
                 />
               </button>
@@ -161,14 +163,14 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
         <div className="mb-6">
           <h4 className="font-semibold mb-3">Add a tip</h4>
           <div className="flex gap-3">
-            {tipOptions.map((amount) => (
+            {[20, 30, 50].map((amount) => (
               <button
                 key={amount}
                 onClick={() => setTip(amount)}
                 className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                   tip === amount
-                    ? 'border-teal-500 bg-teal-50'
-                    : 'border-gray-200 bg-gray-50'
+                    ? "border-teal-500 bg-teal-50"
+                    : "border-gray-200 bg-gray-50"
                 }`}
               >
                 ₹{amount}
@@ -178,8 +180,8 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
               onClick={() => setTip(0)}
               className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                 tip === 0
-                  ? 'border-teal-500 bg-teal-50'
-                  : 'border-gray-200 bg-gray-50'
+                  ? "border-teal-500 bg-teal-50"
+                  : "border-gray-200 bg-gray-50"
               }`}
             >
               No tip
@@ -199,11 +201,7 @@ const TripStatusModal: React.FC<TripStatusModalProps> = ({ trip }) => {
         </div>
 
         {/* Submit Button */}
-        <Button
-          onClick={handleSubmitRating}
-          className="w-full"
-          size="lg"
-        >
+        <Button onClick={handleSubmitRating} className="w-full" size="lg">
           Submit Rating
         </Button>
       </motion.div>

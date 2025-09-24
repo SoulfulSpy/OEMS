@@ -6,7 +6,7 @@ import Button from './Button';
 import { bookRide } from '../services/rideService';
 
 const RideOptionsPanel: React.FC = () => {
-  const [selectedPayment, setSelectedPayment] = useState('card-1234');
+  const [selectedPayment] = useState('card-1234');
   const [promoCode, setPromoCode] = useState('');
   const [isBooking, setIsBooking] = useState(false);
   

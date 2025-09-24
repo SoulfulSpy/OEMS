@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Search, Home, Briefcase, ArrowRight } from "lucide-react";
 import { useRideStore } from "../contexts/rideStore";
 import DestinationSearch from "./DestinationSearch";
+import { getRideEstimate } from "../services/rideService";
 
 interface SearchBarProps {
   onMenuClick: () => void;
@@ -9,10 +10,41 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({}) => {
   const [showDestinationSearch, setShowDestinationSearch] = useState(false);
-  const { destination, userLocation } = useRideStore();
+  const {
+    destination,
+    userLocation,
+    setDestination,
+    setPickupLocation,
+    setAvailableRideOptions,
+  } = useRideStore();
 
   const handleWhereToClick = () => {
     setShowDestinationSearch(true);
+  };
+
+  const handleSelectDestination = async (address: string) => {
+    // Use userLocation as pickup if available
+    if (userLocation) {
+      setPickupLocation(userLocation);
+    }
+    // Simple mock geocode: offset from user location or default center
+    const baseLat = userLocation?.latitude ?? 22.4734;
+    const baseLng = userLocation?.longitude ?? 88.4263;
+    const dest = {
+      latitude: baseLat + 0.01,
+      longitude: baseLng + 0.01,
+      address,
+    };
+    setDestination(dest);
+    setShowDestinationSearch(false);
+
+    try {
+      const options = await getRideEstimate(userLocation ?? dest, dest);
+      setAvailableRideOptions(options);
+    } catch (e) {
+      console.error("Failed to fetch ride estimates", e);
+      setAvailableRideOptions([]);
+    }
   };
 
   return (
@@ -69,7 +101,10 @@ const SearchBar: React.FC<SearchBarProps> = ({}) => {
 
       {/* Destination Search Modal */}
       {showDestinationSearch && (
-        <DestinationSearch onClose={() => setShowDestinationSearch(false)} />
+        <DestinationSearch
+          onClose={() => setShowDestinationSearch(false)}
+          onSelect={handleSelectDestination}
+        />
       )}
     </>
   );

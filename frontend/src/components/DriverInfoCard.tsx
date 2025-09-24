@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Phone, MessageCircle, Star, Navigation } from 'lucide-react';
 import { Driver, Trip } from '../contexts/rideStore';
 import Button from './Button';
-import { formatTime } from '../utils/formatters';
 
 interface DriverInfoCardProps {
   driver: Driver;
