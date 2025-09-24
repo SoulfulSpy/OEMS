@@ -1,0 +1,121 @@
+# -------------------------------
+# Node / React frontend ignores
+# -------------------------------
+
+# dependencies
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+
+# testing
+frontend/coverage/
+
+# production build
+frontend/build/
+
+# misc
+frontend/.DS_Store
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# IDE files
+frontend/.idea/
+frontend/.vscode/
+frontend/*.iml
+
+
+# -------------------------------
+# Java / Spring Boot backend ignores
+# -------------------------------
+
+# Maven / Gradle
+backend/target/
+backend/build/
+backend/.gradle/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Logs
+backend/*.log
+backend/logs/
+
+# IDE files
+backend/.idea/
+backend/.vscode/
+backend/*.iml
+backend/*.ipr
+backend/*.iws
+
+# OS files
+backend/.DS_Store
+backend/Thumbs.db
+
+# Environment files
+backend/.env
+backend/application-*.yml
+backend/application-*.properties
+
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+
+# -------------------------------
+# General ignores (root level)
+# -------------------------------
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE project files
+.idea/
+.vscode/
+*.iml
+
+# Backup files
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Package archives
+*.jar
+*.war
+*.ear
