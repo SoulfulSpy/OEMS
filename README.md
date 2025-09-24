@@ -1,66 +1,80 @@
-# OEMS - Online Event Management System
+# OEMS - On-demand Electronic Mobility Service
 
-A modern, full-stack event management platform built with React (Vite) frontend and Spring Boot backend, designed to streamline event organization and management.
+A modern, scalable ride-hailing platform connecting riders with drivers through intuitive mobile and web applications. Built with cutting-edge technology to deliver seamless transportation experiences.
 
 ## 🚧 Development Status
 
 **🔄 Project is currently in active development**
 
-This project is being actively developed and new features are being added regularly. Some functionality may be incomplete or subject to change.
+This project is being actively developed with new features and improvements being added regularly. The platform is designed for scalability, reliability, and real-time performance.
 
-## 🏗️ Architecture Overview
+## 🏗️ System Overview
 
-OEMS follows a modern full-stack architecture with clear separation between frontend and backend:
+OEMS is built on a modern full-stack architecture designed for scalability and maintainability:
 
 ```
 ┌─────────────────────┐    ┌─────────────────────┐
-│    React Frontend   │    │  Spring Boot API    │
-│  (Vite + Tailwind)  │◄──►│     Backend         │
-│    (Port 5173)      │    │    (Port 8080)      │
+│   React Frontend    │    │  Spring Boot API    │
+│  (Admin Portal)     │◄──►│     Backend         │
+│    (Port 3000)      │    │    (Port 8080)      │
 └─────────────────────┘    └─────────────────────┘
            │                          │
            │                          │
            ▼                          ▼
-    Modern UI/UX with           RESTful APIs &
-    Responsive Design          Business Logic
+    Web-based Admin            RESTful APIs &
+    Dashboard & Portal         Microservices Logic
 ```
 
-## 🚀 Features (Planned/In Development)
+## 🚀 Key Features (In Development)
 
-- **Event Creation & Management**: Create, edit, and manage events
-- **User Registration & Authentication**: Secure user accounts and sessions
-- **Event Registration**: Allow users to register for events
-- **Dashboard**: Comprehensive admin and user dashboards
-- **Real-time Updates**: Live event updates and notifications
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Modern UI**: Clean and intuitive user interface
+### Core Platform Features
+
+- **User Management**: Comprehensive user registration and authentication
+- **Admin Dashboard**: Web-based administrative interface
+- **Real-time Operations**: Live data management and monitoring
+- **Secure Architecture**: JWT-based authentication and authorization
+- **Scalable Backend**: Microservices-ready Spring Boot architecture
+
+### Planned Features
+
+- **Trip Management**: Complete ride booking and management system
+- **Driver & Customer Portals**: Dedicated interfaces for different user types
+- **Payment Integration**: Secure payment processing
+- **Location Services**: GPS tracking and geospatial operations
+- **Analytics & Reporting**: Business intelligence and performance metrics
 
 ## 🛠️ Technology Stack
 
 ### Frontend
 
-- **React 18**: Modern React with hooks
-- **Vite**: Fast build tool and development server
+- **React 18**: Modern frontend framework with hooks
+- **TypeScript**: Type-safe JavaScript development
 - **Tailwind CSS**: Utility-first CSS framework
-- **JavaScript/TypeScript**: Modern ES6+ features
+- **Vite**: Fast build tool and development server
 
 ### Backend
 
-- **Spring Boot**: Java-based backend framework
-- **Spring Security**: Authentication and authorization
-- **Spring Data JPA**: Database abstraction layer
-- **H2 Database**: In-memory database for development
+- **Java 21+**: Modern Java with Spring Boot framework
+- **Spring Boot**: Comprehensive backend framework
+- **PostgreSQL**: Primary database for data persistence
 - **Maven**: Dependency management and build tool
+
+### Development Tools
+
+- **Git**: Version control
+- **REST APIs**: Service communication
+- **JWT**: Authentication and authorization
 
 ## 📋 Prerequisites
 
 - **Node.js**: 18.x or higher
 - **npm/yarn**: Latest version
-- **Java**: 17 or higher
+- **Java**: 21 or higher
 - **Maven**: 3.6 or higher
+- **PostgreSQL**: 16 or higher (optional for development)
 - **Git**: Latest version
 
-## 🛠️ Project Setup
+## 🛠️ Development Setup
 
 ### 1. Clone the Repository
 
@@ -69,20 +83,20 @@ git clone <repository-url>
 cd oems
 ```
 
-### 2. Frontend Setup
+### 2. Backend Setup
+
+```bash
+cd backend
+mvn clean compile
+```
+
+### 3. Frontend Setup
 
 ```bash
 cd frontend
 npm install
 # or
 yarn install
-```
-
-### 3. Backend Setup
-
-```bash
-cd backend
-mvn clean compile
 ```
 
 ### 4. Environment Configuration
@@ -153,65 +167,14 @@ java -jar target/oems-backend-1.0.0.jar
 
 ## 🌐 Access Points
 
-- **Frontend**: http://localhost:5173
+- **Frontend Application**: http://localhost:5173
 - **Backend API**: http://localhost:8080/api
-- **H2 Database Console**: http://localhost:8080/h2-console
-
-## 📡 API Endpoints (Planned)
-
-### Authentication
-
-```http
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/logout
-GET /api/auth/profile
-```
-
-### Events
-
-```http
-GET /api/events
-POST /api/events
-GET /api/events/{id}
-PUT /api/events/{id}
-DELETE /api/events/{id}
-```
-
-### Event Registration
-
-```http
-POST /api/events/{id}/register
-DELETE /api/events/{id}/unregister
-GET /api/events/{id}/attendees
-```
-
-### User Dashboard
-
-```http
-GET /api/users/dashboard
-GET /api/users/registered-events
-GET /api/users/created-events
-```
+- **H2 Database Console**: http://localhost:8080/h2-console (if using H2)
 
 ## 📁 Project Structure
 
 ```
 oems/
-├── frontend/                     # React frontend
-│   ├── public/                   # Static assets
-│   ├── src/
-│   │   ├── components/           # Reusable React components
-│   │   ├── pages/               # Page components
-│   │   ├── hooks/               # Custom React hooks
-│   │   ├── services/            # API services
-│   │   ├── utils/               # Utility functions
-│   │   ├── styles/              # Global styles
-│   │   ├── App.jsx              # Main app component
-│   │   └── main.jsx             # Entry point
-│   ├── package.json
-│   ├── vite.config.js
-│   └── tailwind.config.js
 ├── backend/                      # Spring Boot backend
 │   ├── src/main/java/
 │   │   └── com/oems/
@@ -226,10 +189,32 @@ oems/
 │   │   ├── application.properties
 │   │   └── data.sql              # Sample data
 │   └── pom.xml
+├── frontend/                     # React frontend
+│   ├── public/                   # Static assets
+│   ├── src/
+│   │   ├── components/           # Reusable React components
+│   │   ├── pages/               # Page components
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── services/            # API services
+│   │   ├── utils/               # Utility functions
+│   │   ├── styles/              # Global styles
+│   │   ├── App.jsx              # Main app component
+│   │   └── main.jsx             # Entry point
+│   ├── package.json
+│   ├── vite.config.js
+│   └── tailwind.config.js
 ├── docs/                         # Documentation
 ├── .gitignore
 └── README.md                     # This file
 ```
+
+## 🔒 Security & Compliance
+
+- **Data Encryption**: All sensitive data encrypted at rest and in transit
+- **Authentication**: JWT-based authentication with refresh token rotation
+- **Authorization**: Role-based access control (RBAC)
+- **Privacy**: GDPR and privacy regulation compliance
+- **Monitoring**: Comprehensive logging and monitoring systems
 
 ## 🧪 Testing
 
@@ -249,150 +234,73 @@ cd backend
 mvn test
 ```
 
-## 🚨 Troubleshooting
+## 📊 Monitoring & Analytics
 
-### Common Issues
-
-#### 1. Port Already in Use
-
-```bash
-# Frontend (Port 5173)
-lsof -ti:5173 | xargs kill -9
-
-# Backend (Port 8080)
-lsof -ti:8080 | xargs kill -9
-```
-
-#### 2. npm/yarn Install Issues
-
-```bash
-# Clear cache
-npm cache clean --force
-# or
-yarn cache clean
-
-# Delete node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
-```
-
-#### 3. Maven Build Issues
-
-```bash
-# Clean and compile
-mvn clean compile
-
-# Skip tests if needed
-mvn clean compile -DskipTests
-```
-
-#### 4. CORS Issues
-
-Ensure backend CORS configuration allows frontend origin:
-
-```java
-@CrossOrigin(origins = "http://localhost:5173")
-```
-
-## 🎨 UI/UX Guidelines
-
-### Design System
-
-- **Primary Colors**: Define your brand colors
-- **Typography**: Consistent font hierarchy
-- **Spacing**: Tailwind spacing scale
-- **Components**: Reusable UI components
-
-### Responsive Breakpoints
-
-```css
-/* Mobile first approach */
-sm: 640px   /* Small devices */
-md: 768px   /* Medium devices */
-lg: 1024px  /* Large devices */
-xl: 1280px  /* Extra large devices */
-```
-
-## 🔒 Security Considerations
-
-- **Authentication**: JWT-based authentication
-- **Authorization**: Role-based access control
-- **Input Validation**: Server-side validation for all inputs
-- **CORS**: Proper CORS configuration
-- **Environment Variables**: Secure storage of sensitive data
-
-## 🚀 Deployment (Future)
-
-### Frontend Deployment Options
-
-- **Netlify**: Easy static site deployment
-- **Vercel**: Optimized for React applications
-- **AWS S3 + CloudFront**: Scalable static hosting
-
-### Backend Deployment Options
-
-- **Heroku**: Simple Java application deployment
-- **AWS EC2**: Full control over server environment
-- **Docker**: Containerized deployment
+- **Real-time Metrics**: Live platform performance monitoring
+- **Business Analytics**: Trip, revenue, and user engagement analytics
+- **Health Checks**: Automated service health monitoring
+- **Error Tracking**: Comprehensive error logging and alerting
 
 ## 🤝 Contributors
 
 - **[SoulfulSpy](https://github.com/SoulfulSpy)** - Full Stack Developer
 - **[BiswayanPaul](https://github.com/BiswayanPaul)** - Full Stack Developer
 
-## 🛣️ Roadmap
+## 🛣️ Development Roadmap
 
-### Phase 1 (Current)
+### Phase 1: Foundation (Current)
 
-- [x] Project setup and architecture
+- [x] Project architecture and setup
 - [ ] User authentication system
-- [ ] Basic event CRUD operations
-- [ ] Frontend UI components
+- [ ] Basic admin dashboard
+- [ ] Core API endpoints
 
-### Phase 2 (Upcoming)
+### Phase 2: Core Features
 
-- [ ] Event registration system
-- [ ] User dashboard
-- [ ] Admin panel
-- [ ] Email notifications
+- [ ] User management system
+- [ ] Basic trip management
+- [ ] Database integration
+- [ ] API security implementation
 
-### Phase 3 (Future)
+### Phase 3: Enhanced Platform
 
-- [ ] Advanced search and filtering
-- [ ] Event categories and tags
+- [ ] Mobile applications (Flutter)
+- [ ] Real-time location services
 - [ ] Payment integration
-- [ ] Mobile app development
+- [ ] Advanced admin features
 
-## 📝 Contributing
+### Phase 4: Advanced Features
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- [ ] Microservices architecture
+- [ ] Docker containerization
+- [ ] Advanced analytics
+- [ ] Machine learning integration
 
-### Development Guidelines
+## 🚨 Support & Troubleshooting
 
-- Follow React best practices and hooks patterns
-- Use Tailwind CSS for styling consistently
-- Write clean, commented code
-- Follow Spring Boot conventions
-- Write tests for new features
+### Common Issues
+
+- **Port Conflicts**: Ensure ports 8080 (backend) and 5173 (frontend) are available
+- **Database Connection**: Verify database configuration in application.properties
+- **CORS Issues**: Check CORS configuration if frontend can't connect to backend
+- **Build Failures**: Ensure all dependencies are properly installed
+
+### Getting Help
+
+- Check the documentation in `/docs` folder
+- Review application logs for detailed error information
+- Contact the development team for technical support
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary software. All rights reserved.
 
-## 📞 Support
+## 🔐 Confidentiality Notice
 
-For questions, issues, or contributions:
-
-- Open an issue in the GitHub repository
-- Contact the contributors directly
-- Check the documentation in the `/docs` folder
+This codebase contains proprietary business logic and algorithms. Access is restricted to authorized personnel only. Do not share, distribute, or discuss technical implementation details outside the development team.
 
 ---
 
-**🚧 Remember: This project is in active development. Features and documentation are subject to change.**
+**🚀 Building the Future of Urban Mobility**
 
-**Happy Coding! 🎉**
+**🚧 This platform is under active development. Features and APIs are subject to change.**
