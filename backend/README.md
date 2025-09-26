@@ -236,31 +236,55 @@ RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_secret
 ```
 
-### Quick Start with Docker
+### 🚀 Quick Start with Enhanced Scripts
 
-1. **Clone the repository**
+**Single commands to rule them all!**
 
-   ```bash
-   git clone <repository-url>
-   cd OEMS/backend
-   ```
-
-2. **Start with Docker Compose**
+1. **Start everything (Full Docker Environment)**
 
    ```bash
-   docker-compose up -d
+   ./scripts/oems.sh start
    ```
 
-   This starts:
+   This starts and health-checks:
 
    - OEMS Backend API (port 8080)
    - PostgreSQL database (port 5432)
-   - pgAdmin web interface (port 8081)
+   - pgAdmin web interface (port 5050)
 
-3. **Verify installation**
+2. **Stop everything**
+
    ```bash
-   curl http://localhost:8080/api/welcome
+   ./scripts/oems.sh stop
    ```
+
+3. **Development Mode (Database only + Local Backend)**
+
+   ```bash
+   ./scripts/oems.sh dev          # Start database services
+   ./scripts/local-dev.sh dev     # Start backend with hot-reload
+   ```
+
+4. **Quick Commands Reference**
+
+   ```bash
+   ./scripts/oems.sh start        # Full environment
+   ./scripts/oems.sh dev          # DB only (for development)
+   ./scripts/oems.sh logs         # View all logs
+   ./scripts/oems.sh status       # Check service status
+   ./scripts/oems.sh stop         # Stop everything
+
+   ./scripts/local-dev.sh run     # Run backend locally
+   ./scripts/local-dev.sh test    # Run tests
+   ./scripts/local-dev.sh package # Build JAR
+   ```
+
+### 📋 Service URLs (After Starting)
+
+- **🌐 Backend API:** http://localhost:8080
+- **📚 API Documentation:** http://localhost:8080/swagger-ui.html
+- **🗄️ PgAdmin:** http://localhost:5050 (admin@oems.com / admin123)
+- **📊 Health Check:** http://localhost:8080/actuator/health
 
 ### Manual Setup
 
