@@ -399,6 +399,310 @@ Health check endpoint: `GET /actuator/health`
 
 Additional actuator endpoints available in non-production environments.
 
+## ☁️ AWS Deployment Guide
+
+This application is production-ready and can be deployed to AWS using multiple approaches. Below is the comprehensive guide for AWS deployment.
+
+### 🏗️ AWS ECS Deployment (Recommended)
+
+#### **Prerequisites**
+
+- AWS CLI configured with appropriate permissions
+- Docker installed locally
+- Domain name (optional, but recommended)
+
+#### **Required AWS Services**
+
+- **ECS (Elastic Container Service)** - Container orchestration
+- **ECR (Elastic Container Registry)** - Docker image storage
+- **RDS PostgreSQL** - Managed database
+- **Application Load Balancer** - Traffic distribution
+- **Route 53** - DNS management (optional)
+- **Certificate Manager** - SSL certificates (optional)
+
+#### **Step 1: Create RDS PostgreSQL Database**
+
+```bash
+# Create RDS PostgreSQL instance
+aws rds create-db-instance \
+    --db-instance-identifier oems-production-db \
+    --db-instance-class db.t3.micro \
+    --engine postgres \
+    --engine-version 15.4 \
+    --master-username oems_admin \
+    --master-user-password YOUR_SECURE_PASSWORD \
+    --allocated-storage 20 \
+    --vpc-security-group-ids sg-xxxxxxxxx \
+    --db-subnet-group-name default \
+    --backup-retention-period 7 \
+    --storage-encrypted
+```
+
+#### **Step 2: Create ECR Repository**
+
+```bash
+# Create ECR repository
+aws ecr create-repository --repository-name oems-backend --region us-east-1
+
+# Get login token and authenticate Docker
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789.dkr.ecr.us-east-1.amazonaws.com
+```
+
+#### **Step 3: Build and Push Docker Image**
+
+```bash
+# Build Docker image
+docker build -t oems-backend .
+
+# Tag image for ECR
+docker tag oems-backend:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/oems-backend:latest
+
+# Push to ECR
+docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/oems-backend:latest
+```
+
+#### **Step 4: Create ECS Task Definition**
+
+Create `task-definition.json`:
+
+```json
+{
+  "family": "oems-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::123456789:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "oems-backend",
+      "image": "123456789.dkr.ecr.us-east-1.amazonaws.com/oems-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://oems-production-db.xxxxxxxxx.us-east-1.rds.amazonaws.com:5432/postgres"
+        },
+        {
+          "name": "SPRING_DATASOURCE_USERNAME",
+          "value": "oems_admin"
+        },
+        {
+          "name": "JPA_DDL_AUTO",
+          "value": "validate"
+        },
+        {
+          "name": "JPA_SHOW_SQL",
+          "value": "false"
+        },
+        {
+          "name": "APP_ENVIRONMENT",
+          "value": "production"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SPRING_DATASOURCE_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789:secret:oems/db/password"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789:secret:oems/jwt/secret"
+        },
+        {
+          "name": "TWILIO_ACCOUNT_SID",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789:secret:oems/twilio/sid"
+        },
+        {
+          "name": "TWILIO_AUTH_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789:secret:oems/twilio/token"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/oems-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/actuator/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}
+```
+
+#### **Step 5: Create ECS Service**
+
+```bash
+# Register task definition
+aws ecs register-task-definition --cli-input-json file://task-definition.json
+
+# Create ECS cluster
+aws ecs create-cluster --cluster-name oems-production
+
+# Create ECS service
+aws ecs create-service \
+    --cluster oems-production \
+    --service-name oems-backend-service \
+    --task-definition oems-backend:1 \
+    --desired-count 2 \
+    --launch-type FARGATE \
+    --network-configuration "awsvpcConfiguration={subnets=[subnet-xxxxxxxx,subnet-yyyyyyyy],securityGroups=[sg-xxxxxxxxx],assignPublicIp=ENABLED}" \
+    --load-balancers targetGroupArn=arn:aws:elasticloadbalancing:us-east-1:123456789:targetgroup/oems-backend-tg/1234567890abcdef,containerName=oems-backend,containerPort=8080
+```
+
+#### **Step 6: Production Environment Variables**
+
+Store these securely in AWS Secrets Manager:
+
+```bash
+# Database password
+aws secretsmanager create-secret \
+    --name "oems/db/password" \
+    --description "OEMS Database Password" \
+    --secret-string "YOUR_SECURE_DB_PASSWORD"
+
+# JWT Secret (generate 64+ character string)
+aws secretsmanager create-secret \
+    --name "oems/jwt/secret" \
+    --description "OEMS JWT Secret" \
+    --secret-string "$(openssl rand -base64 64)"
+
+# Twilio credentials
+aws secretsmanager create-secret \
+    --name "oems/twilio/sid" \
+    --description "Twilio Account SID" \
+    --secret-string "YOUR_TWILIO_SID"
+
+aws secretsmanager create-secret \
+    --name "oems/twilio/token" \
+    --description "Twilio Auth Token" \
+    --secret-string "YOUR_TWILIO_AUTH_TOKEN"
+```
+
+### 🚀 AWS Elastic Beanstalk Deployment (Simpler Alternative)
+
+For a simpler deployment approach:
+
+#### **Step 1: Build JAR**
+
+```bash
+./mvnw clean package -DskipTests
+```
+
+#### **Step 2: Create Elastic Beanstalk Application**
+
+```bash
+# Install EB CLI
+pip install awsebcli
+
+# Initialize EB application
+eb init oems-backend --platform java-21 --region us-east-1
+
+# Create environment
+eb create production --database.engine postgres --database.username oems_admin
+```
+
+#### **Step 3: Set Environment Variables**
+
+```bash
+eb setenv \
+    JWT_SECRET="your-64-character-jwt-secret" \
+    TWILIO_ACCOUNT_SID="your_twilio_sid" \
+    TWILIO_AUTH_TOKEN="your_twilio_token" \
+    TWILIO_FROM_NUMBER="your_twilio_phone" \
+    APP_CORS_ALLOWED_ORIGINS="https://yourdomain.com" \
+    JPA_DDL_AUTO="validate" \
+    JPA_SHOW_SQL="false" \
+    APP_ENVIRONMENT="production"
+```
+
+#### **Step 4: Deploy**
+
+```bash
+eb deploy
+```
+
+### 📊 Cost Estimates
+
+#### **ECS Fargate (Production Ready)**
+
+- **ECS Fargate** (2 tasks, 0.5 vCPU, 1GB RAM): ~$25-35/month
+- **RDS PostgreSQL** (db.t3.micro): ~$15-20/month
+- **Application Load Balancer**: ~$16/month
+- **Data Transfer**: ~$5-10/month
+- **Total**: ~$61-81/month
+
+#### **Elastic Beanstalk (Simpler)**
+
+- **EC2 instance** (t3.small): ~$15-20/month
+- **RDS PostgreSQL** (db.t3.micro): ~$15-20/month
+- **Load Balancer**: ~$16/month
+- **Total**: ~$46-56/month
+
+### 🔒 Security Considerations
+
+1. **Use HTTPS**: Configure SSL certificate through AWS Certificate Manager
+2. **Database Security**: Enable encryption at rest and in transit
+3. **Network Security**: Use VPC, private subnets for database
+4. **Secrets Management**: Never hardcode secrets, use AWS Secrets Manager
+5. **IAM Roles**: Use least-privilege access principles
+6. **Monitoring**: Enable CloudWatch logging and monitoring
+
+### 📈 Monitoring & Scaling
+
+#### **CloudWatch Metrics**
+
+- CPU utilization
+- Memory utilization
+- Request count
+- Response time
+- Database connections
+
+#### **Auto Scaling Configuration**
+
+```json
+{
+  "targetCapacity": 2,
+  "minimumCapacity": 1,
+  "maximumCapacity": 10,
+  "scaleOutCooldown": 300,
+  "scaleInCooldown": 300,
+  "targetValue": 70.0,
+  "metricType": "ECSServiceAverageCPUUtilization"
+}
+```
+
+### 🚨 Production Checklist
+
+Before deploying to production:
+
+- [ ] **Database Mode**: Set `JPA_DDL_AUTO=validate`
+- [ ] **Secure JWT Secret**: Generate 64+ character secret
+- [ ] **CORS Configuration**: Set proper allowed origins
+- [ ] **SSL Certificate**: Configure HTTPS
+- [ ] **Database Backup**: Enable automated backups
+- [ ] **Monitoring**: Set up CloudWatch alerts
+- [ ] **Logging**: Configure centralized logging
+- [ ] **Health Checks**: Verify all health check endpoints
+- [ ] **Load Testing**: Test with expected traffic
+- [ ] **Disaster Recovery**: Plan backup and restore procedures
+
 ## 🤝 Contributing
 
 1. Follow existing code style and naming conventions
