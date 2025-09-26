@@ -1,0 +1,689 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "OEMS APIs Test",
+    "description": "Complete API collection for Online Employee Management System (OEMS) - Ride Booking Platform\n\nBase URL: http://localhost:8080\n\nThis collection includes:\n🔐 Authentication APIs\n🚗 Ride Management APIs\n💳 Payment APIs\n🏠 Public/Utility APIs\n\nEnvironment Variables:\n- base_url: http://localhost:8080\n- phone: +1234567890\n- otp_code: (dynamic)\n- trip_id: (dynamic)\n- user_id: (dynamic)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Send OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"OTP sent successfully\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.message).to.equal(\"OTP sent\");",
+                  "    ",
+                  "    // Save OTP code if returned (dev mode)",
+                  "    if (response.otp) {",
+                  "        pm.environment.set(\"otp_code\", response.otp);",
+                  "        console.log(\"OTP saved to environment: \" + response.otp);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Response has required fields\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"message\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phone}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "send-otp"]
+            },
+            "description": "Send OTP to phone number for authentication"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"OTP verification successful\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"isNewUser\");",
+                  "    ",
+                  "    // Save user info if existing user",
+                  "    if (!response.isNewUser && response.user) {",
+                  "        pm.environment.set(\"user_id\", response.user.id);",
+                  "        console.log(\"User ID saved: \" + response.user.id);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Response structure is correct\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"isNewUser\");",
+                  "    if (!response.isNewUser) {",
+                  "        pm.expect(response).to.have.property(\"user\");",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phone}}\",\n  \"otp\": \"{{otp_code}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify-otp"]
+            },
+            "description": "Verify OTP code and check if user exists"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Profile created successfully\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"id\");",
+                  "    pm.expect(response).to.have.property(\"fullName\");",
+                  "    pm.expect(response).to.have.property(\"email\");",
+                  "    pm.expect(response).to.have.property(\"phoneNumber\");",
+                  "    ",
+                  "    // Save user ID",
+                  "    pm.environment.set(\"user_id\", response.id);",
+                  "    console.log(\"User profile created with ID: \" + response.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Profile has correct data\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.fullName).to.equal(\"John Doe Updated\");",
+                  "    pm.expect(response.email).to.equal(\"john.doe.updated@example.com\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john.doe.updated@example.com\",\n  \"phone\": \"{{phone}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/complete-profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "complete-profile"]
+            },
+            "description": "Complete user profile for new users"
+          },
+          "response": []
+        },
+        {
+          "name": "Google Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Note: This endpoint requires a valid Google ID token",
+                  "// For testing, you'll need to get a real token from Google OAuth",
+                  "",
+                  "pm.test(\"Response received\", function () {",
+                  "    pm.response.to.not.be.undefined;",
+                  "});",
+                  "",
+                  "// Only run success tests if we get 200 status",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Google login successful\", function () {",
+                  "        const response = pm.response.json();",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response).to.have.property(\"user\");",
+                  "        pm.expect(response.user).to.have.property(\"id\");",
+                  "        pm.expect(response.user).to.have.property(\"email\");",
+                  "        pm.expect(response.message).to.include(\"Google login successful\");",
+                  "        ",
+                  "        // Save user ID",
+                  "        pm.environment.set(\"user_id\", response.user.id);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"dummy-google-token\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/google",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "google"]
+            },
+            "description": "Login using Google ID token. Replace 'your-google-id-token-here' with actual Google OAuth token."
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication related APIs including OTP, profile completion, and Google login"
+    },
+    {
+      "name": "🚗 Ride Management",
+      "item": [
+        {
+          "name": "Get Ride Estimate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Ride options returned\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an(\"array\");",
+                  "    pm.expect(response.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test(\"Each ride option has required fields\", function () {",
+                  "    const response = pm.response.json();",
+                  "    response.forEach(option => {",
+                  "        pm.expect(option).to.have.property(\"id\");",
+                  "        pm.expect(option).to.have.property(\"name\");",
+                  "        pm.expect(option).to.have.property(\"type\");",
+                  "        pm.expect(option).to.have.property(\"price\");",
+                  "        pm.expect(option).to.have.property(\"eta\");",
+                  "        pm.expect(option).to.have.property(\"capacity\");",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"Save first ride option for booking\", function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.length > 0) {",
+                  "        pm.environment.set(\"selected_ride_option\", JSON.stringify(response[0]));",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup\": {\n    \"latitude\": 12.9716,\n    \"longitude\": 77.5946,\n    \"address\": \"Bangalore Palace, Bangalore\"\n  },\n  \"destination\": {\n    \"latitude\": 12.2958,\n    \"longitude\": 76.6394,\n    \"address\": \"Mysore Palace, Mysore\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rides/estimate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rides", "estimate"]
+            },
+            "description": "Get ride estimates for different vehicle types between pickup and destination"
+          },
+          "response": []
+        },
+        {
+          "name": "Book Ride",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Ride booked successfully\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"id\");",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response).to.have.property(\"price\");",
+                  "    ",
+                  "    // Save trip ID for future requests",
+                  "    pm.environment.set(\"trip_id\", response.id);",
+                  "    console.log(\"Trip booked with ID: \" + response.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Booking status is correct\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.equal(\"STARTED\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup\": {\n    \"latitude\": 12.9716,\n    \"longitude\": 77.5946,\n    \"address\": \"Bangalore Palace, Bangalore\"\n  },\n  \"destination\": {\n    \"latitude\": 12.2958,\n    \"longitude\": 76.6394,\n    \"address\": \"Mysore Palace, Mysore\"\n  },\n  \"rideOption\": {\n    \"id\": \"oems-sedan\",\n    \"name\": \"OEMS Sedan\",\n    \"type\": \"Sedan\",\n    \"price\": 180,\n    \"eta\": 5,\n    \"icon\": \"🚙\",\n    \"capacity\": 4\n  },\n  \"paymentMethod\": \"card\",\n  \"promoCode\": \"SAVE10\",\n  \"userPhone\": \"{{phone}}\",\n  \"userName\": \"John Doe\",\n  \"userEmail\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rides/book",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rides", "book"]
+            },
+            "description": "Book a ride with selected vehicle type and user details"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ride Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Trip details returned\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"id\");",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response).to.have.property(\"price\");",
+                  "    pm.expect(response).to.have.property(\"startTime\");",
+                  "});",
+                  "",
+                  "pm.test(\"Trip ID matches booked trip\", function () {",
+                  "    const response = pm.response.json();",
+                  "    const expectedTripId = pm.environment.get(\"trip_id\");",
+                  "    if (expectedTripId) {",
+                  "        pm.expect(response.id).to.equal(expectedTripId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/rides/{{trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rides", "{{trip_id}}"]
+            },
+            "description": "Get current status and details of a booked ride"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Ride",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Ride cancelled successfully\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response.status).to.equal(\"cancelled\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rides/{{trip_id}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rides", "{{trip_id}}", "cancel"]
+            },
+            "description": "Cancel a booked ride"
+          },
+          "response": []
+        }
+      ],
+      "description": "Ride management APIs including estimation, booking, status checking, and cancellation"
+    },
+    {
+      "name": "💳 Payment",
+      "item": [
+        {
+          "name": "Process Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Payment processed successfully\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response).to.have.property(\"amount\");",
+                  "    pm.expect(response).to.have.property(\"currency\");",
+                  "    pm.expect(response).to.have.property(\"paymentMethod\");",
+                  "    ",
+                  "    pm.expect(response.status).to.equal(\"succeeded\");",
+                  "});",
+                  "",
+                  "pm.test(\"Payment amount is correct\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.amount).to.equal(180);",
+                  "    pm.expect(response.currency).to.equal(\"INR\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Phone",
+                "value": "{{phone}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 180,\n  \"currency\": \"INR\",\n  \"paymentMethod\": \"card\",\n  \"cardToken\": \"card_token_12345\",\n  \"tripId\": \"{{trip_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/charge",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "charge"]
+            },
+            "description": "Process payment for a ride booking"
+          },
+          "response": []
+        }
+      ],
+      "description": "Payment processing APIs"
+    },
+    {
+      "name": "🏠 Public & Utility",
+      "item": [
+        {
+          "name": "Welcome Page",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is HTML\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\");",
+                  "});",
+                  "",
+                  "pm.test(\"Welcome page contains expected content\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"OEMS\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Main welcome page of the application"
+          },
+          "response": []
+        },
+        {
+          "name": "API Welcome",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Welcome message returned\", function () {",
+                  "    const response = pm.response.text();",
+                  "    pm.expect(response).to.include(\"Welcome to OEMS API\");",
+                  "    pm.expect(response).to.include(\"running successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/welcome",
+              "host": ["{{base_url}}"],
+              "path": ["api", "welcome"]
+            },
+            "description": "API welcome endpoint to verify API is running"
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Application is healthy\", function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response.status).to.equal(\"UP\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Health check endpoint to verify application status"
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or redirect\", function () {",
+                  "    pm.expect([200, 301, 302]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test(\"Swagger UI accessible\", function () {",
+                  "    const response = pm.response.text();",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(response).to.include(\"swagger\");",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/swagger-ui.html",
+              "host": ["{{base_url}}"],
+              "path": ["swagger-ui.html"]
+            },
+            "description": "Swagger UI for API documentation"
+          },
+          "response": []
+        }
+      ],
+      "description": "Public endpoints and utility APIs"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Making request to:', pm.request.url.toString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test(\"Response time is reasonable\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "phone",
+      "value": "+1234567890",
+      "type": "string"
+    },
+    {
+      "key": "otp_code",
+      "value": "123456",
+      "type": "string"
+    },
+    {
+      "key": "trip_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

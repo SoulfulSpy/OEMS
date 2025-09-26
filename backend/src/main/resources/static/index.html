@@ -3,9 +3,80 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>OEMS - Online Employee Management System</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+      .links {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .link {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 12px 24px;
+        border-radius: 25px;
+        text-decoration: none;
+        color: white;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .link:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+      .status {
+        margin-top: 30px;
+        padding: 15px;
+        background: rgba(76, 175, 80, 0.3);
+        border-radius: 10px;
+        border: 1px solid rgba(76, 175, 80, 0.5);
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello, World!</h1>
+    <div class="container">
+      <h1>🚀 OEMS</h1>
+      <p class="subtitle">Online Employee Management System</p>
+      <p>Welcome! Your Spring Boot application is running successfully.</p>
+
+      <div class="links">
+        <a href="/actuator/health" class="link">Health Check</a>
+        <a href="/swagger-ui.html" class="link">API Documentation</a>
+        <a href="/api/welcome" class="link">API Welcome</a>
+      </div>
+
+      <div class="status">✅ Application Status: <strong>RUNNING</strong></div>
+    </div>
   </body>
 </html>

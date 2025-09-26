@@ -1,0 +1,102 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: oems-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-oems_db}
+      POSTGRES_USER: ${POSTGRES_USER:-oems_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oems_password}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - oems-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-oems_user} -d ${POSTGRES_DB:-oems_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin for your team members
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: oems-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@oems.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - oems-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Spring Boot Application
+  oems-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: oems-backend
+    restart: unless-stopped
+    environment:
+      # Database Configuration
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-oems_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-oems_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-oems_password}
+
+      # JPA Configuration
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-true}
+
+      # Security Configuration
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-this-in-production-environment-make-it-at-least-64-characters-long}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      OTP_EXPIRATION: ${OTP_EXPIRATION:-300000}
+
+      # Twilio Configuration
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+      TWILIO_MESSAGING_SERVICE_SID: ${TWILIO_MESSAGING_SERVICE_SID:-}
+
+      # CORS Configuration
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
+
+      # Application Environment
+      APP_ENV: ${APP_ENV:-dev}
+
+    ports:
+      - "8080:8080"
+    networks:
+      - oems-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - app_logs:/app/logs
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  app_logs:
+    driver: local
+
+networks:
+  oems-network:
+    driver: bridge
