@@ -32,6 +32,13 @@ public class AuthController {
         if (phone == null || phone.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("message", "phone is required"));
         }
+        // TODO: Enhance OTP generation and security
+        // - Use cryptographically secure random number generator
+        // - Implement rate limiting to prevent OTP spam (max 3 OTPs per phone per hour)
+        // - Add phone number validation and formatting
+        // - Consider using shorter expiry time (2-3 minutes) for better security
+        // - Implement OTP retry mechanism with exponential backoff
+        // - Add audit logging for OTP generation and verification attempts
         String code = String.valueOf(100000 + (int)(Math.random() * 900000));
         OtpCode otp = new OtpCode();
         otp.setPhone(phone);
@@ -100,6 +107,14 @@ public class AuthController {
 
     @PostMapping("/complete-profile")
     public ResponseEntity<Object> completeProfile(@RequestBody Map<String, String> req) {
+        // TODO: Add proper input validation and JWT token authentication
+        // - Validate JWT token to ensure user is authenticated
+        // - Add comprehensive input validation (email format, name length, etc.)
+        // - Implement duplicate email/phone checking with proper error messages
+        // - Add profile image upload support
+        // - Implement user role assignment (customer, driver, admin)
+        // - Add profile completion tracking and status updates
+        // - Send welcome email/SMS after profile completion
         try {
             String name = req.get("name");
             String email = req.get("email");
@@ -141,7 +156,7 @@ public class AuthController {
                 "message", "idToken is required"
             ));
         }
-        
+        // TODO:
         // In development/test mode, accept a dummy token for testing
         String appEnv = System.getenv("APP_ENV");
         if ("dev".equalsIgnoreCase(appEnv) && "dummy-google-token".equals(idToken)) {
@@ -162,7 +177,12 @@ public class AuthController {
             ));
         }
         
-        // Production Google token verification
+        // TODO: Replace basic Google token verification with proper OAuth2 implementation
+        // - Use Google's official Java client library instead of manual HTTP calls
+        // - Implement proper JWT signature validation
+        // - Add token expiration and audience validation
+        // - Handle Google API rate limits and errors gracefully
+        // - Consider using Spring Security OAuth2 for better integration
         try {
             var uri = java.net.URI.create("https://oauth2.googleapis.com/tokeninfo?id_token=" + 
                 java.net.URLEncoder.encode(idToken, java.nio.charset.StandardCharsets.UTF_8));
@@ -170,9 +190,7 @@ public class AuthController {
                 String json = new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
                 // Light parsing to extract email and name
                 String email = extractJsonValue(json, "email");
-                String name = extractJsonValue(json, "name");
-                
-                if (email == null) {
+                String name = extractJsonValue(json, "name");                if (email == null) {
                     return ResponseEntity.status(401).body(Map.of(
                         "success", false,
                         "message", "Invalid Google token - no email found"
@@ -184,6 +202,11 @@ public class AuthController {
                     User u = new User();
                     u.setEmail(email);
                     u.setFullName(name != null ? name : email);
+                    // TODO: Replace dummy phone number generation with proper phone verification flow
+                    // - Prompt user to enter and verify their phone number after Google OAuth
+                    // - Implement phone number verification step in the frontend
+                    // - Store user as PENDING_PHONE_VERIFICATION status until verified
+                    // - Don't allow ride booking until phone is verified and confirmed
                     u.setPhoneNumber("+10000000000");
                     try {
                         return userService.save(u);
@@ -221,6 +244,11 @@ public class AuthController {
         }
     }
 
+    // TODO: Replace manual JSON parsing with proper JSON library
+    // - Use Jackson ObjectMapper or Gson for robust JSON parsing
+    // - Add proper error handling for malformed JSON
+    // - Handle JSON escape sequences and special characters
+    // - Consider using Google's JWT library for token parsing
     private static String extractJsonValue(String json, String key) {
         String pattern = "\"" + key + "\":\"";
         int i = json.indexOf(pattern);

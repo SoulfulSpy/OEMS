@@ -15,7 +15,15 @@ public class PaymentController {
 
     @PostMapping("/charge")
     public ResponseEntity<Object> charge(@RequestBody Map<String, Object> body, @RequestHeader(value = "X-User-Phone", required = false) String phone) {
-        // Dummy success response for now
+        // TODO: Replace dummy payment processing with real payment gateway integration
+        // - Integrate with Stripe, Razorpay, or other payment processors
+        // - Implement proper payment validation and error handling
+        // - Add support for multiple payment methods (cards, wallets, UPI)
+        // - Implement payment retries and failure handling
+        // - Add transaction logging and audit trail
+        // - Validate payment amounts and currency
+        // - Implement refund and chargeback handling
+        // - Add payment security measures (tokenization, encryption)
         return ResponseEntity.ok(Map.of(
                 "status", "succeeded",
                 "amount", body.getOrDefault("amount", 0),

@@ -34,6 +34,12 @@ public class RideController {
 
     @PostMapping("/estimate")
     public ResponseEntity<List<Map<String, Object>>> estimate(@RequestBody Map<String, Object> req) {
+        // TODO: Replace with real fare estimation logic
+        // - Integrate with Google Maps Distance Matrix API for accurate distance/time calculation
+        // - Implement dynamic pricing based on demand and supply
+        // - Consider traffic conditions, peak hours, and surge pricing
+        // - Validate pickup and destination coordinates
+        // - Add support for different service types (economy, premium, luxury)
         List<Map<String, Object>> options = List.of(
                 option("oems-go", "OEMS Go", "Hatchback", 120, 3, "🚗", 4),
                 option("oems-sedan", "OEMS Sedan", "Sedan", 180, 5, "🚙", 4),
@@ -53,6 +59,12 @@ public class RideController {
         Map<String, Object> rideOption = (Map<String, Object>) req.get("rideOption");
         String userPhone = (String) req.get("userPhone");
         
+        // TODO: Replace auto-user creation with proper authentication validation
+        // - Validate user is authenticated before allowing ride booking
+        // - Use JWT token validation instead of phone number lookup
+        // - Ensure user has completed profile verification
+        // - Check user account status (active, suspended, etc.)
+        // - Implement proper user session management
         User user = userService.findByPhone(userPhone)
                 .orElseGet(() -> {
                     User u = new User();
@@ -72,7 +84,12 @@ public class RideController {
         
         trip.setCustomerId(user.getId());
         
-        // Set dummy driver and vehicle IDs for now (required by schema)
+        // TODO: Replace dummy driver/vehicle assignment with real driver matching logic
+        // - Implement driver matching algorithm based on proximity and availability
+        // - Query available drivers within radius using PostGIS spatial queries
+        // - Consider driver ratings, vehicle type compatibility, and estimated arrival time
+        // - Implement driver acceptance/rejection workflow with timeout
+        // - Add real-time driver location tracking using Redis/MQTT
         trip.setDriverId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         trip.setVehicleId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         
@@ -83,6 +100,13 @@ public class RideController {
         trip.setDestinationLatitude(BigDecimal.valueOf((Double) destination.get("latitude")));
         trip.setDestinationLongitude(BigDecimal.valueOf((Double) destination.get("longitude")));
         trip.setEstimatedFare(BigDecimal.valueOf((Integer) rideOption.get("price")));
+        // TODO: Replace immediate trip start with proper booking workflow
+        // - Initial status should be REQUESTED, not STARTED
+        // - Implement driver acceptance workflow before changing to ACCEPTED
+        // - Add DRIVER_ARRIVING status when driver is en route to pickup
+        // - Only change to STARTED when driver arrives and customer enters vehicle
+        // - Add proper state machine validation for status transitions
+        // - Implement timeout handling for driver acceptance (e.g., 2 minutes)
         trip.setStatus(Trip.TripStatus.STARTED);
         trip.setStartedAt(Instant.now());
         trip = tripService.save(trip);
@@ -134,6 +158,12 @@ public class RideController {
         }
     }
 
+    // TODO: Replace hardcoded ride options with database-driven vehicle types
+    // - Store vehicle types and their properties in database (VehicleType entity)
+    // - Make pricing configurable based on city, time, and demand
+    // - Add support for different service categories (economy, premium, luxury, ambulance)
+    // - Implement regional pricing variations
+    // - Add dynamic ETA calculation based on real traffic data
     private Map<String, Object> option(String id, String name, String type, int price, int eta, String icon, int capacity) {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("id", id);
