@@ -128,13 +128,26 @@ public class ShowroomAdminController {
         // - Log the change for audit
         // - Notify driver of status changes
         
+        // Validate rating if provided
+        double validatedRating = 4.5; // Default rating
+        if (request.rating != null) {
+            if (request.rating < 0.0 || request.rating > 5.0) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Rating must be between 0.0 and 5.0",
+                    "error", "INVALID_RATING"
+                ));
+            }
+            validatedRating = request.rating;
+        }
+        
         return ResponseEntity.ok(Map.of(
             "success", true,
             "driverId", actualDriverId,
             "driver", Map.of(
                 "status", request.status != null ? request.status : "ACTIVE",
                 "vehicleNumber", request.vehicleNumber != null ? request.vehicleNumber : "N/A",
-                "rating", request.rating != null ? request.rating : 4.5
+                "rating", validatedRating
             ),
             "message", "Driver updated successfully (dummy implementation)"
         ));

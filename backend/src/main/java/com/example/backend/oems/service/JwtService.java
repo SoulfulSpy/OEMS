@@ -151,9 +151,19 @@ public class JwtService {
         try {
             Claims claims = parseToken(token);
             String userIdStr = claims.get(AppConstants.JWT_CLAIM_USER_ID, String.class);
+            if (userIdStr == null || userIdStr.isEmpty()) {
+                System.err.println("[JWT] User ID claim is null or empty in token");
+                return Optional.empty();
+            }
             return Optional.of(UUID.fromString(userIdStr));
+        } catch (JwtException e) {
+            System.err.println("[JWT] Token parsing failed: " + e.getMessage());
+            return Optional.empty();
+        } catch (IllegalArgumentException e) {
+            System.err.println("[JWT] Invalid UUID format in user ID claim: " + e.getMessage());
+            return Optional.empty();
         } catch (Exception e) {
-            System.err.println("[JWT] Failed to extract user ID: " + e.getMessage());
+            System.err.println("[JWT] Unexpected error extracting user ID: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             return Optional.empty();
         }
     }
@@ -164,15 +174,27 @@ public class JwtService {
     public Optional<UserInfo> extractUserInfo(String token) {
         try {
             Claims claims = parseToken(token);
+            String userIdStr = claims.get(AppConstants.JWT_CLAIM_USER_ID, String.class);
+            if (userIdStr == null || userIdStr.isEmpty()) {
+                System.err.println("[JWT] User ID claim is null or empty in token");
+                return Optional.empty();
+            }
+            
             UserInfo userInfo = new UserInfo(
-                UUID.fromString(claims.get(AppConstants.JWT_CLAIM_USER_ID, String.class)),
+                UUID.fromString(userIdStr),
                 claims.get(AppConstants.JWT_CLAIM_PHONE, String.class),
                 claims.get("email", String.class),
                 claims.get("name", String.class)
             );
             return Optional.of(userInfo);
+        } catch (JwtException e) {
+            System.err.println("[JWT] Token parsing failed: " + e.getMessage());
+            return Optional.empty();
+        } catch (IllegalArgumentException e) {
+            System.err.println("[JWT] Invalid UUID format in user ID claim: " + e.getMessage());
+            return Optional.empty();
         } catch (Exception e) {
-            System.err.println("[JWT] Failed to extract user info: " + e.getMessage());
+            System.err.println("[JWT] Unexpected error extracting user info: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             return Optional.empty();
         }
     }
