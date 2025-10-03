@@ -147,12 +147,14 @@ public class User {
 
     /**
      * User role enumeration based on system actors
+     * Enhanced for multi-admin system
      */
     public enum UserRole {
-        CUSTOMER,
-        DRIVER,
-        FLEET_ADMIN,
-        SUPER_ADMIN
+        CUSTOMER,           // Customer app users
+        DRIVER,            // Driver app users  
+        SHOWROOM_ADMIN,    // Showroom-specific admin
+        SUPER_ADMIN,       // Platform-wide admin (Naiyo24)
+        DRIVER_ADMIN       // Driver self-management (lower priority)
     }
 }
 

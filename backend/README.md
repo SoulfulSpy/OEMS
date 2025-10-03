@@ -165,6 +165,40 @@ Payment (1..*)    Rating (1..*)
 - **Status Management**: Comprehensive state machine for bookings/trips
 - **Emergency Features**: SOS button and emergency contacts
 
+### 6. Multi-Admin System (NEW)
+
+#### **Showroom Admin**
+
+- Driver and vehicle fleet management
+- Ride monitoring and analytics
+- Showroom-specific performance reports
+- API: `/api/showroom-admin/*`
+
+#### **Super Admin (Naiyo24 Platform)**
+
+- Platform-wide user and showroom management
+- System configuration and audit logs
+- Financial reports and analytics
+- API: `/api/super-admin/*`
+
+#### **Driver Admin**
+
+- Advanced driver self-management
+- Earnings analytics and performance metrics
+- Support ticketing and market insights
+- API: `/api/driver-admin/*`
+
+#### **Driver App Backend**
+
+- Ride acceptance/rejection workflow
+- Real-time location tracking
+- Trip management (start/complete/cancel)
+- Earnings and performance tracking
+- API: `/api/driver/*`
+
+**New Entities**: `Showroom`, `ShowroomAdmin`, `SuperAdmin`  
+**Enhanced Roles**: `CUSTOMER`, `DRIVER`, `SHOWROOM_ADMIN`, `SUPER_ADMIN`, `DRIVER_ADMIN`
+
 ## 🛠️ Technology Stack
 
 ### Backend Framework
@@ -345,9 +379,48 @@ Once the application is running, access the API documentation at:
 
 ### Key Endpoints
 
+#### Authentication
+
 - `POST /api/auth/send-otp` - Send OTP to phone number
 - `POST /api/auth/verify-otp` - Verify OTP and authenticate
 - `POST /api/auth/complete-profile` - Complete user profile
+
+#### Customer Ride Management
+
+- `POST /api/ride/estimate` - Get ride fare estimate
+- `POST /api/ride/book` - Book a new ride
+- `GET /api/ride/history` - Get ride history
+- `POST /api/ride/{id}/cancel` - Cancel a ride
+
+#### Showroom Admin (Role: SHOWROOM_ADMIN)
+
+- `GET /api/showroom-admin/drivers` - List drivers in showroom
+- `GET /api/showroom-admin/rides/active` - Monitor active rides
+- `GET /api/showroom-admin/analytics/daily` - Daily performance metrics
+- `PUT /api/showroom-admin/drivers/{id}/status` - Update driver status
+
+#### Super Admin (Role: SUPER_ADMIN)
+
+- `GET /api/super-admin/users` - List all platform users
+- `POST /api/super-admin/showrooms` - Create new showroom
+- `GET /api/super-admin/reports/financial` - Financial reports
+- `GET /api/super-admin/audit-logs` - System audit logs
+
+#### Driver (Role: DRIVER)
+
+- `GET /api/driver/rides/pending` - Get available rides
+- `POST /api/driver/rides/{id}/accept` - Accept a ride
+- `PUT /api/driver/location` - Update driver location
+- `GET /api/driver/earnings` - View earnings summary
+
+#### Driver Admin (Role: DRIVER_ADMIN)
+
+- `GET /api/driver-admin/analytics/performance` - Performance analytics
+- `POST /api/driver-admin/support/ticket` - Create support ticket
+- `GET /api/driver-admin/market-insights` - Market insights
+
+#### System
+
 - `GET /actuator/health` - Health check endpoint
 
 ## 🔒 Security
